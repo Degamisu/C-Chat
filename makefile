@@ -4,7 +4,7 @@ HEADER	= src/msg.h
 OUT	= out/out
 CC	 = gcc
 FLAGS	 = -g -c -Wall
-LFLAGS	 = 
+LFLAGS	 = -lws2_32
 
 all: $(OBJS)
 	mkdir out

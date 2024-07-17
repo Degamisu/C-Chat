@@ -1,39 +1,44 @@
-//`main.c` defines the basic functions for CHAT.
-
+// msg.c
 #include <stdio.h>
-#include <string.h>
+#include <winsock2.h>
 #include "msg.h"
-#include <stdbool.h>
 
-char* getname(){ // get name of user
-
-    static char name[20];
-    printf("Please enter your name:");
-    scanf("%19s", name);
-    return name;
-
+SOCKET create_socket() {
+    return socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 }
 
-int main() { // main program
+int connect_to_server(SOCKET sock, const char* server_ip, int port) {
+    struct sockaddr_in server_addr;
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_addr.s_addr = inet_addr(server_ip);
+    server_addr.sin_port = htons(port);
 
-    char* name = getname();
-    bool running = true;
+    return connect(sock, (SOCKADDR*)&server_addr, sizeof(server_addr));
+}
 
-    while (running) {
-        // Check for user input
-        char input[1024];
-        if (fgets(input, sizeof(input), stdin)) {
-            input[strcspn(input, "\n")] = 0;
+void send_message(SOCKET sock, const char* msg) {
+    send(sock, msg, strlen(msg), 0);
+}
 
-            if (strcmp(input, "exit") == 0) {
-                running = false;
-                printf("Exiting...\n");
-            } else {
-                send_message(input, 9800); // FIXME
-            }
-        }
-        receive_message();
+void receive_message(SOCKET sock) {
+    char recvbuf[1024];
+    int recvbuflen = 1024;
+    int bytes_received = recv(sock, recvbuf, recvbuflen, 0);
+    if (bytes_received > 0) {
+        recvbuf[bytes_received] = '\0'; // Null-terminate the received data
+        printf("Received: %s\n", recvbuf);
     }
+}
 
-    return 1;
+void initialize_winsock() {
+    WSADATA wsaData;
+    int result = WSAStartup(MAKEWORD(2, 2), &wsaData);
+    if (result != 0) {
+        printf("WSAStartup failed: %d\n", result);
+        exit(1);
+    }
+}
+
+void cleanup_winsock() {
+    WSACleanup();
 }
