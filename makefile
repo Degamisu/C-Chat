@@ -7,6 +7,7 @@ FLAGS	 = -g -c -Wall
 LFLAGS	 = 
 
 all: $(OBJS)
+	mkdir out
 	$(CC) -g $(OBJS) -o $(OUT) $(LFLAGS)
 
 main.o: src/main.c
