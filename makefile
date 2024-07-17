@@ -19,6 +19,7 @@ msg.o: src/msg.c
 
 clean:
 	rm -f $(OBJS) $(OUT)
+	rmdir out
 
 run: $(OUT)
 	./$(OUT)
